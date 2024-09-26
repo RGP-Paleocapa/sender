@@ -72,7 +72,7 @@ jobs:
       - name: Copy built files to target repository
         run: |
           rm -rf receiver/*  # Ensure the target repo is cleared
-          cp -r ./dist/* receiver/  # Copy from dist to the checked out target repo
+          cp -r ./dist/* ./  # Copy from dist to the checked out target repo
 
       - name: Push to target repository
         run: |
