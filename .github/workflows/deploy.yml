@@ -27,6 +27,8 @@ jobs:
         run: npm run lint
 
       - name: Build project
+        env:
+          VITE_BASE_URL: ${{ secrets.VITE_BASE_URL }}
         run: npm run build
 
       - name: Check dist contents before upload
