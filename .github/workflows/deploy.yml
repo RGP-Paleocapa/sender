@@ -74,11 +74,27 @@ jobs:
           echo "Files in receiver repository:"
           ls -la .  # List files in the target repo to confirm checkout
 
+      - name: Verify dist existence before copying
+        run: |
+          echo "Checking if dist directory exists:"
+          if [ -d "./dist" ]; then
+            echo "dist directory exists."
+            ls -la ./dist  # List files in the dist directory
+          else
+            echo "dist directory does NOT exist."
+          fi
+
       - name: Copy built files to target repository
         run: |
           echo "Clearing target repo and copying files..."
           rm -rf *  # Clear files in the target repo (if necessary)
-          cp -r ./dist/* ./  # Copy from dist to the current directory (target repo)
+          echo "Attempting to copy files from dist to target repo..."
+          if [ -d "./dist" ] && [ "$(ls -A ./dist)" ]; then
+            cp -r ./dist/* ./  # Copy from dist to the current directory (target repo)
+          else
+            echo "No files found in dist to copy."
+            exit 1  # Fail the step if dist is empty or does not exist
+          fi
 
       - name: Push to target repository
         run: |
