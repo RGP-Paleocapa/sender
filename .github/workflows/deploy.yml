@@ -43,73 +43,78 @@ jobs:
             ./dist/vite.svg
             ./dist/assets/**  # Upload all files in the assets folder
 
-  deploy:
-    name: Deploy
-    needs: build
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
-
-    steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: production-files
-          path: ./dist
-
-      - name: Verify downloaded files
-        run: |
-          echo "Verifying contents of dist directory after downloading:"
-          ls -la ./dist  # List files to ensure they were downloaded
-
-      - name: Print working directory
-        run: |
-          echo "Current working directory: $(pwd)"
-          ls -la  # List all files in the current directory
-
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
-
-      - name: Checkout the target repository
-        uses: actions/checkout@v4
-        with:
-          repository: rgp-paleocapa/receiver  # Change to the target repo's name
-          ref: master  # Specify the branch in the target repo you want to push to
-          token: ${{ secrets.TARGET_REPO_TOKEN }}  # Use the personal access token for authentication
-
-      - name: Verify checkout
-        run: |
-          echo "Files in receiver repository after checkout:"
-          ls -la .  # List files in the target repo to confirm checkout
-
-      - name: Verify dist existence before copying
-        run: |
-          echo "Checking if dist directory exists in the target repo:"
-          if [ -d "./dist" ]; then
-            echo "dist directory exists."
-            ls -la ./dist  # List files in the dist directory
-          else
-            echo "dist directory does NOT exist."
-          fi
-
-      - name: Copy built files to target repository
-        run: |
-          echo "Clearing target repo and copying files..."
-          rm -rf *  # Clear files in the target repo (if necessary)
-          echo "Attempting to copy files from dist to target repo..."
-          if [ -d "./dist" ] && [ "$(ls -A ./dist)" ]; then
-            cp -r ./dist/* ./  # Copy from dist to the current directory (target repo)
-          else
-            echo "No files found in dist to copy."
-            exit 1  # Fail the step if dist is empty or does not exist
-          fi
-
-      - name: Push to target repository
-        run: |
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-          git add .
-          git commit -m "Deploy from source repo" || echo "No changes to commit"
-          git push origin master  # Push to the appropriate branch
+            deploy:
+                name: Deploy
+                needs: build
+                runs-on: ubuntu-latest
+                if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+            
+                steps:
+                  - name: Download artifact
+                    uses: actions/download-artifact@v4
+                    with:
+                      name: production-files
+                      path: ./dist
+            
+                  - name: Verify downloaded files
+                    run: |
+                      echo "Verifying contents of dist directory after downloading:"
+                      ls -la ./dist  # List files to ensure they were downloaded
+                      echo "Checking for specific files:"
+                      test -f ./dist/index.html && echo "index.html exists." || echo "index.html does NOT exist."
+                      test -f ./dist/vite.svg && echo "vite.svg exists." || echo "vite.svg does NOT exist."
+                      test -d ./dist/assets && echo "assets directory exists." || echo "assets directory does NOT exist."
+            
+                  - name: Print working directory
+                    run: |
+                      echo "Current working directory: $(pwd)"
+                      ls -la  # List all files in the current directory
+            
+                  - name: Deploy to GitHub Pages
+                    uses: peaceiris/actions-gh-pages@v4
+                    with:
+                      github_token: ${{ secrets.GITHUB_TOKEN }}
+                      publish_dir: ./dist
+            
+                  - name: Checkout the target repository
+                    uses: actions/checkout@v4
+                    with:
+                      repository: rgp-paleocapa/receiver  # Change to the target repo's name
+                      ref: master  # Specify the branch in the target repo you want to push to
+                      token: ${{ secrets.TARGET_REPO_TOKEN }}  # Use the personal access token for authentication
+            
+                  - name: Verify checkout
+                    run: |
+                      echo "Files in receiver repository after checkout:"
+                      ls -la .  # List files in the target repo to confirm checkout
+            
+                  - name: Verify dist existence before copying
+                    run: |
+                      echo "Checking if dist directory exists in the target repo:"
+                      if [ -d "./dist" ]; then
+                        echo "dist directory exists."
+                        ls -la ./dist  # List files in the dist directory
+                      else
+                        echo "dist directory does NOT exist."
+                      fi
+            
+                  - name: Copy built files to target repository
+                    run: |
+                      echo "Clearing target repo and copying files..."
+                      rm -rf *  # Clear files in the target repo (if necessary)
+                      echo "Attempting to copy files from dist to target repo..."
+                      if [ -d "./dist" ] && [ "$(ls -A ./dist)" ]; then
+                        cp -r ./dist/* ./  # Copy from dist to the current directory (target repo)
+                      else
+                        echo "No files found in dist to copy."
+                        exit 1  # Fail the step if dist is empty or does not exist
+                      fi
+            
+                  - name: Push to target repository
+                    run: |
+                      git config user.name "GitHub Actions"
+                      git config user.email "actions@github.com"
+                      git add .
+                      git commit -m "Deploy from source repo" || echo "No changes to commit"
+                      git push origin master  # Push to the appropriate branch
+            
