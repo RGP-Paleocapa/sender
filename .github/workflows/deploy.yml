@@ -30,9 +30,7 @@ jobs:
         run: npm run build
 
       - name: Check dist contents before upload
-        run: |
-          echo "Contents of dist directory before upload:"
-          ls -la ./dist  # List files to ensure they were built
+        run: ls -la ./dist  # List files to ensure they were built
 
       - name: Upload production-ready build files
         uses: actions/upload-artifact@v4
@@ -53,27 +51,6 @@ jobs:
           name: production-files
           path: ./dist
 
-      - name: Verify downloaded files
-        run: |
-          echo "Verifying contents of dist directory after downloading:"
-          ls -la ./dist  # List files to ensure they were downloaded
-          echo "Checking for specific files:"
-          if test -f ./dist/index.html; then
-            echo "index.html exists."
-          else
-            echo "index.html does NOT exist."
-          fi
-          if test -f ./dist/vite.svg; then
-            echo "vite.svg exists."
-          else
-            echo "vite.svg does NOT exist."
-          fi
-
-      - name: Print working directory
-        run: |
-          echo "Current working directory: $(pwd)"
-          ls -la  # List all files in the current directory
-
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
@@ -89,41 +66,15 @@ jobs:
           path: ./receiver
 
       - name: Clear target repo and prepare for copying files
-        run: |
-          echo "Clearing target repo before copying files..."
-          rm -rf ./receiver/*  # Clear all files in the target repo
+        run: rm -rf ./receiver/*  # Clear all files in the target repo
 
       - name: Copy built files to target repository
         run: |
-          echo "Attempting to copy files from dist to target repo..."
-          
-          # Check if the 'dist' directory exists and is not empty
           if [ -d "./dist" ] && [ "$(ls -A ./dist)" ]; then
             cp -r ./dist/* ./receiver/  # Copy all files and subdirectories from dist to the target repo
-            echo "Files copied from dist to target repo."
           else
-            echo "No files found in dist. Checking for alternative directories..."
-            
-            # Check for other potential directories
-            alternative_dirs=("build" "out" "public")  # List alternative directories to check
-            
-            found_files=false  # Flag to track if any files are found
-            
-            for dir in "${alternative_dirs[@]}"; do
-              if [ -d "./$dir" ] && [ "$(ls -A ./$dir)" ]; then
-                echo "Found files in $dir. Copying files to target repo..."
-                cp -r ./$dir/* ./receiver/  # Copy all files and subdirectories from alternative directory to the target repo
-                echo "Files copied from $dir to target repo."
-                found_files=true  # Set flag to true
-                break  # Exit loop after copying
-              fi
-            done
-            
-            # If no files were found in any directories
-            if [ "$found_files" = false ]; then
-              echo "No files found in dist or alternative directories."
-              exit 1  # Fail the step if no files were found
-            fi
+            echo "No files found in dist."
+            exit 1  # Fail the step if no files were found
           fi
         
       - name: Push to target repository
