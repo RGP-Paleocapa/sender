@@ -29,6 +29,11 @@ jobs:
       - name: Build project
         run: npm run build
 
+      - name: Check dist contents before upload
+        run: |
+          echo "Contents of dist directory before upload:"
+          ls -la ./dist  # List files to ensure they were built
+
       - name: Upload production-ready build files
         uses: actions/upload-artifact@v4
         with:
@@ -75,12 +80,6 @@ jobs:
           repository: rgp-paleocapa/receiver  # Change to the target repo's name
           ref: master  # Specify the branch in the target repo you want to push to
           token: ${{ secrets.TARGET_REPO_TOKEN }}  # Use the personal access token for authentication
-
-      - name: Restore dist from temporary location
-        run: |
-          echo "Restoring dist from downloaded artifact..."
-          cp -r ./dist/* ./  # Copy files back to the current directory (target repo)
-          echo "Files restored to the target repository."
 
       - name: Clear target repo and prepare for copying files
         run: |
