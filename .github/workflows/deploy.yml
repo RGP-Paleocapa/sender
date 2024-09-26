@@ -96,7 +96,7 @@ jobs:
         run: |
           echo "Attempting to copy files from dist to target repo..."
           if [ -d "./dist" ] && [ "$(ls -A ./dist)" ]; then
-            cp -r ./dist/* ./  # Copy from dist to the current directory (target repo)
+            cp -r ./dist/* ./  # Copy all files and subdirectories from dist to the current directory (target repo)
             echo "Files copied from dist to target repo."
           else
             echo "No files found in dist to copy."
