@@ -68,12 +68,6 @@ jobs:
           else
             echo "vite.svg does NOT exist."
           fi
-          if [ -d "./dist/assets" ]; then
-            echo "assets directory exists."
-            ls -la ./dist/assets  # List contents of the assets directory
-          else
-            echo "assets directory does NOT exist."
-          fi
 
       - name: Print working directory
         run: |
@@ -93,25 +87,10 @@ jobs:
           ref: master  # Specify the branch in the target repo you want to push to
           token: ${{ secrets.TARGET_REPO_TOKEN }}  # Use the personal access token for authentication
 
-      - name: Verify checkout
-        run: |
-          echo "Files in receiver repository after checkout:"
-          ls -la .  # List files in the target repo to confirm checkout
-
-      - name: Verify dist existence before copying
-        run: |
-          echo "Checking if dist directory exists in the target repo:"
-          if [ -d "./dist" ]; then
-            echo "dist directory exists."
-            ls -la ./dist  # List files in the dist directory
-          else
-            echo "dist directory does NOT exist."
-          fi
-
       - name: Clear target repo and prepare for copying files
         run: |
           echo "Clearing target repo before copying files..."
-          rm -rf *  # Clear files in the target repo (if necessary)
+          rm -rf *  # Clear all files in the target repo
 
       - name: Copy built files to target repository
         run: |
