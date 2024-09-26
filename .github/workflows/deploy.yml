@@ -22,14 +22,10 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-
-      - name: Set VITE_BASE_URL
-        id: set_base_url
-        run: echo "VITE_BASE_URL=${{ secrets.VITE_BASE_URL || '/sender/' }}" >> $GITHUB_ENV
       
       - name: Build project
         env:
-          VITE_BASE_URL: ${{ env.VITE_BASE_URL }}
+          VITE_BASE_URL: ${{ secrets.VITE_BASE_URL }}
         run: |
           echo "Building project with VITE_BASE_URL: $VITE_BASE_URL"
           npm run build      
