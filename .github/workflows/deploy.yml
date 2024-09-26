@@ -85,7 +85,7 @@ jobs:
         with:
           repository: rgp-paleocapa/receiver  # Change to the target repo's name
           ref: master  # Specify the branch in the target repo you want to push to
-          token: ${{ secrets.GITHUB_TOKEN }}  # Use the personal access token for authentication
+          token: ${{ secrets.TARGET_REPO_TOKEN }}  # Use the personal access token for authentication
           path: ./receiver
 
       - name: Clear target repo and prepare for copying files
