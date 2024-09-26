@@ -74,6 +74,12 @@ jobs:
           echo "Current working directory: $(pwd)"
           ls -la  # List all files in the current directory
 
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+
       - name: Checkout the target repository
         uses: actions/checkout@v4
         with:
