@@ -30,7 +30,9 @@ jobs:
         run: npm run build
 
       - name: Verify build output
-        run: ls -la ./dist  # List files to confirm they exist
+        run: |
+          echo "Verifying contents of dist directory after build:"
+          ls -la ./dist  # List files to confirm they exist
 
       - name: Upload production-ready build files
         uses: actions/upload-artifact@v4
@@ -53,8 +55,13 @@ jobs:
 
       - name: Verify downloaded files
         run: |
-          echo "Verifying contents of dist directory:"
+          echo "Verifying contents of dist directory after downloading:"
           ls -la ./dist  # List files to ensure they were downloaded
+
+      - name: Print working directory
+        run: |
+          echo "Current working directory: $(pwd)"
+          ls -la  # List all files in the current directory
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
@@ -71,12 +78,12 @@ jobs:
 
       - name: Verify checkout
         run: |
-          echo "Files in receiver repository:"
+          echo "Files in receiver repository after checkout:"
           ls -la .  # List files in the target repo to confirm checkout
 
       - name: Verify dist existence before copying
         run: |
-          echo "Checking if dist directory exists:"
+          echo "Checking if dist directory exists in the target repo:"
           if [ -d "./dist" ]; then
             echo "dist directory exists."
             ls -la ./dist  # List files in the dist directory
