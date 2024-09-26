@@ -53,3 +53,24 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
+
+      - name: Checkout the target repository
+        uses: actions/checkout@v4
+        with:
+          repository: rgp-paleocapa/receiver  # Change to the target repo's name
+          ref: main  # Specify the branch in the target repo you want to push to (main or others)
+          token: ${{ secrets.TARGET_REPO_TOKEB }}  # Use the personal access token for authentication
+
+      - name: Copy built files to target repository
+        run: |
+          rm -rf receiver/*
+          cp -r ./dist/* receiver/
+
+      - name: Push to target repository
+        run: |
+          cd target-repo
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -m "Deploy from source repo"
+          git push origin main  # Make sure to push to the appropriate branch
