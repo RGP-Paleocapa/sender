@@ -51,6 +51,11 @@ jobs:
           name: production-files
           path: ./dist
 
+      - name: Verify downloaded files
+        run: |
+          echo "Verifying contents of dist directory:"
+          ls -la ./dist  # List files to ensure they were downloaded
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
@@ -71,7 +76,8 @@ jobs:
 
       - name: Copy built files to target repository
         run: |
-          rm -rf *  # Ensure the target repo is cleared
+          echo "Clearing target repo and copying files..."
+          rm -rf *  # Clear files in the target repo (if necessary)
           cp -r ./dist/* ./  # Copy from dist to the current directory (target repo)
 
       - name: Push to target repository
