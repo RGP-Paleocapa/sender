@@ -67,7 +67,7 @@ jobs:
       - name: Verify checkout
         run: |
           echo "Files in receiver repository:"
-          ls -la receiver  # List files in the target repo to confirm checkout
+          ls -la .  # List files in the target repo to confirm checkout
 
       - name: Copy built files to target repository
         run: |
