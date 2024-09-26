@@ -69,11 +69,6 @@ jobs:
           echo "Current working directory: $(pwd)"
           ls -la  # List all files in the current directory
 
-      - name: Prepare to checkout the target repository
-        run: |
-          echo "Copying dist to a temporary location..."
-          cp -r ./dist ../dist-temp  # Copy to a temp directory outside the current repo context
-
       - name: Checkout the target repository
         uses: actions/checkout@v4
         with:
@@ -83,8 +78,8 @@ jobs:
 
       - name: Restore dist from temporary location
         run: |
-          echo "Restoring dist from temporary location..."
-          cp -r ../dist-temp/* ./  # Copy files back to the current directory (target repo)
+          echo "Restoring dist from downloaded artifact..."
+          cp -r ./dist/* ./  # Copy files back to the current directory (target repo)
           echo "Files restored to the target repository."
 
       - name: Clear target repo and prepare for copying files
