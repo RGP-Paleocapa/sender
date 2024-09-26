@@ -87,6 +87,22 @@ jobs:
           ref: master  # Specify the branch in the target repo you want to push to
           token: ${{ secrets.TARGET_REPO_TOKEN }}  # Use the personal access token for authentication
 
+      - name: Verify downloaded files
+        run: |
+            echo "Verifying contents of dist directory after downloading:"
+            ls -la ./dist  # List files to ensure they were downloaded
+            echo "Checking for specific files:"
+            if test -f ./dist/index.html; then
+                echo "index.html exists."
+            else
+                echo "index.html does NOT exist."
+            fi
+            if test -f ./dist/vite.svg; then
+                echo "vite.svg exists."
+            else
+                echo "vite.svg does NOT exist."
+            fi
+
       - name: Clear target repo and prepare for copying files
         run: |
           echo "Clearing target repo before copying files..."
