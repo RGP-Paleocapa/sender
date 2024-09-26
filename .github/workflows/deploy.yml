@@ -85,44 +85,44 @@ jobs:
       - name: Clear target repo and prepare for copying files
         run: |
           echo "Clearing target repo before copying files..."
-          rm -rf *  # Clear all files in the target repo
+          rm -rf ./receiver/*  # Clear all files in the target repo
 
       - name: Copy built files to target repository
         run: |
-            echo "Attempting to copy files from dist to target repo..."
+          echo "Attempting to copy files from dist to target repo..."
+          
+          # Check if the 'dist' directory exists and is not empty
+          if [ -d "./dist" ] && [ "$(ls -A ./dist)" ]; then
+            cp -r ./dist/* ./receiver/  # Copy all files and subdirectories from dist to the target repo
+            echo "Files copied from dist to target repo."
+          else
+            echo "No files found in dist. Checking for alternative directories..."
             
-            # Check if the 'dist' directory exists and is not empty
-            if [ -d "./dist" ] && [ "$(ls -A ./dist)" ]; then
-              cp -r ./dist/* ./  # Copy all files and subdirectories from dist to the current directory (target repo)
-              echo "Files copied from dist to target repo."
-            else
-              echo "No files found in dist. Checking for alternative directories..."
-              
-              # Check for other potential directories
-              alternative_dirs=("build" "out" "public")  # List alternative directories to check
-              
-              found_files=false  # Flag to track if any files are found
-              
-              for dir in "${alternative_dirs[@]}"; do
-                if [ -d "./$dir" ] && [ "$(ls -A ./$dir)" ]; then
-                  echo "Found files in $dir. Copying files to target repo..."
-                  cp -r ./$dir/* ./  # Copy all files and subdirectories from alternative directory to the current directory (target repo)
-                  echo "Files copied from $dir to target repo."
-                  found_files=true  # Set flag to true
-                  break  # Exit loop after copying
-                fi
-              done
-              
-              # If no files were found in any directories
-              if [ "$found_files" = false ]; then
-                echo "No files found in dist or alternative directories."
-                exit 1  # Fail the step if no files were found
+            # Check for other potential directories
+            alternative_dirs=("build" "out" "public")  # List alternative directories to check
+            
+            found_files=false  # Flag to track if any files are found
+            
+            for dir in "${alternative_dirs[@]}"; do
+              if [ -d "./$dir" ] && [ "$(ls -A ./$dir)" ]; then
+                echo "Found files in $dir. Copying files to target repo..."
+                cp -r ./$dir/* ./receiver/  # Copy all files and subdirectories from alternative directory to the target repo
+                echo "Files copied from $dir to target repo."
+                found_files=true  # Set flag to true
+                break  # Exit loop after copying
               fi
+            done
+            
+            # If no files were found in any directories
+            if [ "$found_files" = false ]; then
+              echo "No files found in dist or alternative directories."
+              exit 1  # Fail the step if no files were found
             fi
+          fi
         
-
       - name: Push to target repository
         run: |
+          cd ./receiver  # Change to the target repo directory
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git add .
