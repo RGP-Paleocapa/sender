@@ -61,8 +61,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: rgp-paleocapa/receiver  # Change to the target repo's name
-          ref: main  # Specify the branch in the target repo you want to push to (main or others)
-          token: ${{ secrets.TARGET_REPO_TOKEN }}  # Use the personal access token for authentication
+          ref: master  # Specify the branch in the target repo you want to push to (main or others)
+          token: ${{ secrets.GITHUB_TOKEN }}  # Use the personal access token for authentication
 
       - name: Verify checkout
         run: |
