@@ -23,12 +23,12 @@ jobs:
       - name: Install dependencies
         run: npm install
       
-      - name: Build project
+      - name: Build project for primary repo
         env:
-          VITE_BASE_URL: ${{ secrets.VITE_BASE_URL }}
+          VITE_BASE_URL: ${{ secrets.VITE_BASE_URL }}  # Default base URL
         run: |
           echo "Building project with VITE_BASE_URL: $VITE_BASE_URL"
-          npm run build      
+          npm run build
 
       - name: Check dist contents before upload
         run: ls -la ./dist  # List files to ensure they were built
@@ -58,18 +58,46 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
 
+  deploy-to-second-repo:
+    name: Deploy to Second Repo
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+
+    steps:
+      - name: Checkout the source repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Rebuild project with VITE_BASE_URL for second repo
+        env:
+          VITE_BASE_URL: '/receiver/'  # Base URL for the target repo
+        run: |
+          echo "Rebuilding project with VITE_BASE_URL: $VITE_BASE_URL"
+          npm run build
+
+      - name: Check dist contents after rebuild
+        run: ls -la ./dist  # List files to ensure they were rebuilt
+
       - name: Checkout the target repository
         uses: actions/checkout@v4
         with:
           repository: rgp-paleocapa/receiver  # Change to the target repo's name
-          ref: master  # Specify the branch in the target repo you want to push to
-          token: ${{ secrets.TARGET_REPO_TOKEN }}  # Use the personal access token for authentication
+          ref: master  # Specify the branch in the target repo
+          token: ${{ secrets.TARGET_REPO_TOKEN }}  # Use the personal access token
           path: ./receiver
 
       - name: Clear target repo and prepare for copying files
         run: rm -rf ./receiver/*  # Clear all files in the target repo
 
-      - name: Copy built files to target repository
+      - name: Copy rebuilt files to target repository
         run: |
           if [ -d "./dist" ] && [ "$(ls -A ./dist)" ]; then
             cp -r ./dist/* ./receiver/  # Copy all files and subdirectories from dist to the target repo
@@ -84,5 +112,5 @@ jobs:
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git add .
-          git commit -m "Deploy from source repo" || echo "No changes to commit"
+          git commit -m "Deploy from source repo with updated VITE_BASE_URL" || echo "No changes to commit"
           git push origin master  # Push to the appropriate branch
