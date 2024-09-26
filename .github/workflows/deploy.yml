@@ -51,21 +51,27 @@ jobs:
           name: production-files
           path: ./dist
 
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+
       - name: Checkout the target repository
         uses: actions/checkout@v4
         with:
-          repository: rgp-paleocapa/receiver  # Specify the target repo's name
+          repository: rgp-paleocapa/receiver  # Change to the target repo's name
           ref: master  # Specify the branch in the target repo you want to push to
           token: ${{ secrets.TARGET_REPO_TOKEN }}  # Use the personal access token for authentication
 
       - name: Verify checkout
         run: |
           echo "Files in receiver repository:"
-          ls -la .  # List files in the current directory to confirm checkout
+          ls -la .  # List files in the target repo to confirm checkout
 
       - name: Copy built files to target repository
         run: |
-          rm -rf *  # Ensure the target repo is cleared (use cautiously)
+          rm -rf *  # Ensure the target repo is cleared
           cp -r ./dist/* ./  # Copy from dist to the current directory (target repo)
 
       - name: Push to target repository
@@ -74,4 +80,4 @@ jobs:
           git config user.email "actions@github.com"
           git add .
           git commit -m "Deploy from source repo" || echo "No changes to commit"
-          git push origin master  # Make sure to push to the appropriate branch
+          git push origin master  # Push to the appropriate branch
