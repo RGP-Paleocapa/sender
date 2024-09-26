@@ -29,6 +29,9 @@ jobs:
       - name: Build project
         run: npm run build
 
+      - name: Verify build output
+        run: ls -la ./dist  # List files to confirm they exist
+
       - name: Upload production-ready build files
         uses: actions/upload-artifact@v4
         with:
@@ -59,18 +62,23 @@ jobs:
         with:
           repository: rgp-paleocapa/receiver  # Change to the target repo's name
           ref: main  # Specify the branch in the target repo you want to push to (main or others)
-          token: ${{ secrets.TARGET_REPO_TOKEB }}  # Use the personal access token for authentication
+          token: ${{ secrets.TARGET_REPO_TOKEN }}  # Use the personal access token for authentication
+
+      - name: Verify checkout
+        run: |
+          echo "Files in receiver repository:"
+          ls -la receiver  # List files in the target repo to confirm checkout
 
       - name: Copy built files to target repository
         run: |
-          rm -rf receiver/*
-          cp -r ./dist/* receiver/
+          rm -rf receiver/*  # Ensure the target repo is cleared
+          cp -r ./dist/* receiver/  # Copy from dist to the checked out target repo
 
       - name: Push to target repository
         run: |
-          cd target-repo
+          cd receiver  # Use the correct path
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git add .
-          git commit -m "Deploy from source repo"
+          git commit -m "Deploy from source repo" || echo "No changes to commit"
           git push origin main  # Make sure to push to the appropriate branch
