@@ -12,6 +12,6 @@ export default defineConfig(({ mode }) => {
         server: {
             open: true,
         },
-        base: env.VITE_BASE_URL || '/',
+        base: './'
     };
 });
