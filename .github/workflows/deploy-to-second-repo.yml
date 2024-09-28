@@ -16,23 +16,21 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
         
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '18'  # Specify the Node.js version to use
 
       - name: Install dependencies
-        run: npm install
+        run: npm install  # Install the project's dependencies
       
       - name: Build project
-        env:
-          VITE_BASE_URL: './'  # Default base URL
         run: |
-          echo "Building project with VITE_BASE_URL: $VITE_BASE_URL"
-          npm run build
+          echo "Building project..."
+          npm run build  # Build the project to generate the dist directory
 
       - name: Check dist contents before upload
-        run: ls -la ./dist  # List files to ensure they were built
+        run: ls -la ./dist  # List files to ensure they were built successfully
 
       - name: Checkout the target repository
         uses: actions/checkout@v4 
@@ -40,7 +38,7 @@ jobs:
           repository: rgp-paleocapa/receiver  # Change to the target repo's name
           ref: master  # Specify the branch in the target repo
           token: ${{ secrets.TARGET_REPO_TOKEN }}  # Use the personal access token
-          path: ./receiver
+          path: ./receiver  # Checkout the target repository to a specified path
 
       - name: Clear target repo and prepare for copying files
         run: rm -rf ./receiver/*  # Clear all files in the target repo
@@ -50,15 +48,15 @@ jobs:
           if [ -d "./dist" ] && [ "$(ls -A ./dist)" ]; then
             cp -r ./dist/* ./receiver/  # Copy all files and subdirectories from dist to the target repo
           else
-            echo "No files found in dist."
+            echo "No files found in dist."  # Log an error if no files were found
             exit 1  # Fail the step if no files were found
           fi
         
       - name: Push to target repository
         run: |
           cd ./receiver  # Change to the target repo directory
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-          git add .
-          git commit -m "Deploy from source repo with updated VITE_BASE_URL" || echo "No changes to commit"
+          git config user.name "GitHub Actions"  # Set the commit author name
+          git config user.email "actions@github.com"  # Set the commit author email
+          git add .  # Stage all changes
+          git commit -m "Deploy from source repo with updated VITE_BASE_URL" || echo "No changes to commit"  # Commit changes or skip if none
           git push origin master  # Push to the appropriate branch

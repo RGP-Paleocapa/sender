@@ -15,45 +15,43 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '18'  # Specify the Node.js version to use
 
       - name: Install dependencies
-        run: npm install
+        run: npm install  # Install the project's dependencies
       
       - name: Build project for primary repo
-        env:
-          VITE_BASE_URL: './'  # Default base URL
         run: |
-          echo "Building project with VITE_BASE_URL: $VITE_BASE_URL"
-          npm run build
+          echo "Building project..."
+          npm run build  # Build the project to generate the dist directory
 
       - name: Check dist contents before upload
-        run: ls -la ./dist  # List files to ensure they were built
+        run: ls -la ./dist  # List files to ensure they were built successfully
 
       - name: Upload production-ready build files
         uses: actions/upload-artifact@v4
         with:
-          name: production-files
-          path: ./dist
+          name: production-files  # Name for the artifact
+          path: ./dist  # Path to the files to upload
 
   deploy:
     name: Deploy
-    needs: build
+    needs: build  # Ensure this job runs after the build job
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'  # Only run on main or master branches
 
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: production-files
-          path: ./dist
+          name: production-files  # Name of the artifact to download
+          path: ./dist  # Path where the artifact will be downloaded
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
+          github_token: ${{ secrets.GITHUB_TOKEN }}  # Token for authentication
+          publish_dir: ./dist  # Directory to publish to GitHub Pages
