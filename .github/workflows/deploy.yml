@@ -42,7 +42,7 @@ jobs:
     name: Deploy to GitHub Pages
     needs: build
     runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/main' }}
+    if: ${{ github.ref == 'refs/heads/$default-branch' }}
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v4
@@ -60,7 +60,7 @@ jobs:
     name: Deploy to Second Repo
     needs: build
     runs-on: ubuntu-latest
-    if: ${{ startsWith(github.ref, 'refs/tags/') && github.ref == 'refs/heads/main' }}
+    if: ${{ startsWith(github.ref, 'refs/tags/') && github.ref == 'refs/heads/$default-branch' }}
 
     steps:
       - name: Checkout the source repo
