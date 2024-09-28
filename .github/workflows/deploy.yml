@@ -65,23 +65,23 @@ jobs:
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
 
     steps:
-      - name: Checkout the source repo
-        uses: actions/checkout@v4
+      # - name: Checkout the source repo
+      #   uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
+      # - name: Setup Node
+      #   uses: actions/setup-node@v4
+      #   with:
+      #     node-version: '18'
 
-      - name: Install dependencies
-        run: npm install
+      # - name: Install dependencies
+      #   run: npm install
 
-      - name: Rebuild project with VITE_BASE_URL for second repo
-        env:
-          VITE_BASE_URL: './'  # Base URL for the target repo
-        run: |
-          echo "Rebuilding project with VITE_BASE_URL: $VITE_BASE_URL"
-          npm run build
+      # - name: Rebuild project with VITE_BASE_URL for second repo
+      #   env:
+      #     VITE_BASE_URL: './'  # Base URL for the target repo
+      #   run: |
+      #     echo "Rebuilding project with VITE_BASE_URL: $VITE_BASE_URL"
+      #     npm run build
 
       - name: Check dist contents after rebuild
         run: ls -la ./dist  # List files to ensure they were rebuilt
