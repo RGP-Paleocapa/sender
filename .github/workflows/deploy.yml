@@ -3,8 +3,9 @@ name: Deploy
 on:
   push:
     branches:
-      - main
-      - master
+      - $default-branch  # Use the default branch for the repository
+    tags:
+      - '*'  # Trigger the deployment on any new tag
 
 jobs:
   build:
@@ -40,10 +41,10 @@ jobs:
           path: ./dist
 
   deploy:
-    name: Deploy
+    name: Deploy to GitHub Pages
     needs: build
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    if: ${{ github.ref == 'refs/heads/$default-branch' }}
 
     steps:
       - name: Download artifact
@@ -62,7 +63,7 @@ jobs:
     name: Deploy to Second Repo
     needs: build
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    if: startsWith(github.ref, 'refs/tags/')  # Trigger deployment on any tag
 
     steps:
       - name: Checkout the source repo
@@ -89,9 +90,9 @@ jobs:
       - name: Checkout the target repository
         uses: actions/checkout@v4
         with:
-          repository: rgp-paleocapa/receiver  # Change to the target repo's name
+          repository: rgp-paleocapa/receiver  # Target repo name
           ref: master  # Specify the branch in the target repo
-          token: ${{ secrets.TARGET_REPO_TOKEN }}  # Use the personal access token
+          token: ${{ secrets.TARGET_REPO_TOKEN }}  # Use personal access token
           path: ./receiver
 
       - name: Clear target repo and prepare for copying files
@@ -100,7 +101,7 @@ jobs:
       - name: Copy rebuilt files to target repository
         run: |
           if [ -d "./dist" ] && [ "$(ls -A ./dist)" ]; then
-            cp -r ./dist/* ./receiver/  # Copy all files and subdirectories from dist to the target repo
+            cp -r ./dist/* ./receiver/  # Copy all files to the target repo
           else
             echo "No files found in dist."
             exit 1  # Fail the step if no files were found
