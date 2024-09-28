@@ -83,8 +83,8 @@ jobs:
       #     echo "Rebuilding project with VITE_BASE_URL: $VITE_BASE_URL"
       #     npm run build
 
-      - name: Check dist contents after rebuild
-        run: ls -la ./dist  # List files to ensure they were rebuilt
+      # - name: Check dist contents after rebuild
+      #   run: ls -la ./dist  # List files to ensure they were rebuilt
 
       - name: Checkout the target repository
         uses: actions/checkout@v4
