@@ -72,7 +72,7 @@ jobs:
           path: ./dist
 
       - name: Checkout the target repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4 
         with:
           repository: rgp-paleocapa/receiver  # Change to the target repo's name
           ref: master  # Specify the branch in the target repo
