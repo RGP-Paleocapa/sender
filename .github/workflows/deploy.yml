@@ -3,9 +3,7 @@ name: Deploy
 on:
   push:
     branches:
-      - $default-branch  # Use the default branch for the repository
-    tags:
-      - '*'  # Trigger the deployment on any new tag
+      - $default-branch 
 
 jobs:
   build:
@@ -23,7 +21,7 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-      
+
       - name: Build project for primary repo
         env:
           VITE_BASE_URL: ${{ secrets.VITE_BASE_URL }}  # Default base URL
@@ -44,8 +42,7 @@ jobs:
     name: Deploy to GitHub Pages
     needs: build
     runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/$default-branch' }}
-
+    if: ${{ github.ref == 'refs/heads/main' }}
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v4
@@ -63,7 +60,7 @@ jobs:
     name: Deploy to Second Repo
     needs: build
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')  # Trigger deployment on any tag
+    if: ${{ startsWith(github.ref, 'refs/tags/') && github.ref == 'refs/heads/main' }}
 
     steps:
       - name: Checkout the source repo
@@ -106,7 +103,7 @@ jobs:
             echo "No files found in dist."
             exit 1  # Fail the step if no files were found
           fi
-        
+
       - name: Push to target repository
         run: |
           cd ./receiver  # Change to the target repo directory
