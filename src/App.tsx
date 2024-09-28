@@ -4,7 +4,7 @@ function App() {
   console.log('Base URL in App:', import.meta.env.VITE_BASE_URL); // Check the value in the App
   return (
     <>
-      <p>Base URL: {import.meta.env.VITE_BASE_URL}</p>
+      <p>Test: {import.meta.env.VITE_BASE_URL}</p>
     </>
   );
 }
