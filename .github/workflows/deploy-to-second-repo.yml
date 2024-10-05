@@ -1,11 +1,9 @@
-# .github/workflows/deploy-to-second-repo.yml
-
 name: Build and Deploy to Second Repo
 
 on:
   push:
     tags:
-      - '*'  # Trigger on any tag push
+      - 'v*.*.*'  # Trigger on any tag push
 
 jobs:
   build-and-deploy:
@@ -41,8 +39,10 @@ jobs:
           path: ./receiver  # Checkout the target repository to a specified path
 
       - name: Clear target repo and prepare for copying files
-        run: rm -rf ./receiver/*  # Clear all files in the target repo
-
+        run: |
+          find ./receiver -type f ! -name 'README.md' -exec rm -f {} +  # Remove all files except README.md
+          find ./receiver -type d -empty -delete  # Remove empty directories
+  
       - name: Copy rebuilt files to target repository
         run: |
           if [ -d "./dist" ] && [ "$(ls -A ./dist)" ]; then
@@ -51,7 +51,7 @@ jobs:
             echo "No files found in dist."  # Log an error if no files were found
             exit 1  # Fail the step if no files were found
           fi
-        
+  
       - name: Push to target repository
         run: |
           cd ./receiver  # Change to the target repo directory
